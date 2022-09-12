@@ -1,0 +1,23 @@
+{
+  "name": "dicordbot",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "start": "node src/index.js",
+    "dev": "nodemon src/index.js",
+    "deployCommands": "node src/deploy-commands"
+  },
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "@discordjs/builders": "^1.2.0",
+    "@discordjs/rest": "^1.1.0",
+    "discord-api-types": "^0.37.8",
+    "discord.js": "^14.3.0",
+    "dotenv": "^16.0.2",
+    "node-fetch": "^3.2.10",
+    "python-shell": "^3.0.1",
+    "request": "^2.81.0"
+  }
+}
