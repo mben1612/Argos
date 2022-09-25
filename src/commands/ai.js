@@ -15,7 +15,7 @@ module.exports ={
 
 
     async execute(interaction) {
-        const msg = interaction.reply({content:"generating..."});
+        const msg = interaction.deferReply();
         translater("en",interaction.options.getString("text"),0,function(response){
             var leng = 100;
             if(interaction.options.getInteger("length") != undefined){

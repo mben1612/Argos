@@ -25,9 +25,34 @@ client.once("ready",()=>{
         // alle 5 Sekunden ausführen 
     }, 5000);
 })
+client.on('message', async msg => {
+    // console.log(msg);
+});
 
 client.on("interactionCreate", async (interaction) => {
+    // console.log(interaction);
+    if(interaction.isButton()){
+        const args = interaction.customId.split(" ")
+        const customid = args[0].trim();
+        // const customid = "trivia";
+        // console.log(interaction);
+        var originalcommand;
+        // console.log(customid);
+        switch(customid){          
+            case "trivia": 
+                originalcommand = client.commands.get('trivia');
+                interaction.reply({content:"you clicked " + args[1], ephemeral: true });
+                break;
+        }
+        
+        // console.log(originalcommand);
+        originalcommand.buttonclick(interaction);
+        return;
+    }
     if(!interaction.isCommand()) return
+
+
+    
 
     const command = client.commands.get(interaction.commandName)
 

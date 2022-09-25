@@ -13,7 +13,7 @@ module.exports ={
 
 
     async execute(interaction) {
-        const msg = interaction.reply({content:"übersetzen..."});
+        const msg = interaction.deferReply();
         if(interaction.options._hoistedOptions[2] != undefined){
             // translate(interaction.options._hoistedOptions[1].value,interaction.options._hoistedOptions[0].value,interaction.options._hoistedOptions[2].value,interaction);
             translater(interaction.options._hoistedOptions[1].value,interaction.options._hoistedOptions[0].value,interaction.options._hoistedOptions[2].value, async function(body){
