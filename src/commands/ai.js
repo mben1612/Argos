@@ -8,7 +8,7 @@ const aiapi = require("../aiapi.js");
 module.exports ={
     data: new SlashCommandBuilder()
         .setName('ai')
-        .setDescription('Generates a text(WIP)')
+        .setDescription('Generates a text')
         .addStringOption(option1 => option1.setName("text").setDescription("Der Text").setRequired(true))
         .addIntegerOption(option2 => option2.setName("length").setDescription("Die Textlänge").setRequired(false))
         .addStringOption(option3 => option3.setName("language").setDescription("Ergebnis übersetzen").setRequired(false)),

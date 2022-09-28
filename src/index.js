@@ -1,8 +1,9 @@
 require("dotenv").config()
 const fs = require("fs")
 const {Client, ActivityType, Collection, GatewayIntentBits} = require("discord.js");
+const {Player} = require("discord-player");
 
-const client = new Client({intents:[GatewayIntentBits.Guilds,GatewayIntentBits.GuildMessages]});
+const client = new Client({intents:[GatewayIntentBits.Guilds,GatewayIntentBits.GuildMessages,GatewayIntentBits.GuildVoiceStates]});
 
 client.commands = new Collection();
 
@@ -49,7 +50,16 @@ client.on("interactionCreate", async (interaction) => {
         originalcommand.buttonclick(interaction);
         return;
     }
-    if(!interaction.isCommand()) return
+    if (interaction.isSelectMenu()){
+        var originalcommand;
+        // console.log(interaction);
+        // interaction.reply({content:"you chose " , ephemeral: true });
+        originalcommand = client.commands.get(interaction.customId);
+        // console.log(originalcommand);
+         originalcommand.chose(interaction);
+        return;
+    } 
+    if(!interaction.isCommand()) return;
 
 
     
@@ -70,5 +80,10 @@ client.on("interactionCreate", async (interaction) => {
         }
     }
 })
-
+client.player = new Player(client,{
+    ytdlOptions:{
+        quality:"highestaudio",
+        highWaterMark: 1<<25
+    }
+})
 client.login(process.env.DISCORD_BOT_TOKEN);
