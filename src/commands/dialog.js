@@ -8,7 +8,7 @@ const aiapi = require("../aiapi.js");
 module.exports ={
     data: new SlashCommandBuilder()
         .setName('dialog')
-        .setDescription('You can talk')
+        .setDescription('You can talk(WIP)')
         .addSubcommand(subCommand=> subCommand.setName("start").setDescription("Startet"))
         .addSubcommand(subCommand=> subCommand.setName("end").setDescription("Beendet")),
 
