@@ -27,17 +27,18 @@ module.exports ={
 
 
         const queueString = queue.tracks.slice(page*10,page *10 +10).map((song,i)=>{
-            return`${page * 10 + i + 1}. \`[${song.duration}]\` ${song.title} -- <@${song.requestedBy.id}> `;
+            return`${page * 10 + i + 1}. \`[${song.duration}]\` ${song.title} - ${song.author} -- <@${song.requestedBy.id}> `;
             
         }).join("\n");
 
         const currentSong = queue.current
+        console.log(currentSong);
         console.log(queueString.toString());
         await interaction.editReply({
             embeds:[
                 new EmbedBuilder()
                     .setDescription(`**Currently Playing**\n` +
-                    currentSong ? `\`[${currentSong.duration}]\`${currentSong.title} -- <@${currentSong.requestedBy.id}>`+`\n\n**Queue**\n${queueString}\n` : "None"
+                    currentSong ? `\`[${currentSong.duration}]\`${currentSong.title} -${currentSong.author}  -- <@${currentSong.requestedBy.id}>`+`\n\n**Queue**\n${queueString}\n` : "None"
                     
                     )
                     .setFooter({

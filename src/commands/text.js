@@ -7,8 +7,8 @@ module.exports ={
         .setName('text')
         .setDescription('Random Text or word')
         .addSubcommand(subCommand=> subCommand.setName("satz").setDescription("zufälliger Satz")
-        .addIntegerOption(option => option.setName("length").setDescription("Wie viele Sätze").setRequired(false))
-        .addStringOption(option3 => option3.setName("language").setDescription("Ergebnis übersetzen").setRequired(false)),)         
+            .addIntegerOption(option => option.setName("length").setDescription("Wie viele Sätze").setRequired(false))
+            .addStringOption(option3 => option3.setName("language").setDescription("Ergebnis übersetzen").setRequired(false)),)         
         .addSubcommand(subCommand=> subCommand.setName("wort").setDescription("zufälliges Wort")),
 
 
