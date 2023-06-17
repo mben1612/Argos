@@ -9,14 +9,15 @@ module.exports ={
 
     async execute(interaction,client) {
         await interaction.deferReply();
-        const queue = client.player.getQueue(interaction.guildId);
+        const queue = client.player.nodes.get(interaction.guildId);
 
         if(!queue ){
             await interaction.editReply("Akttuellefswefsefs");
             return ;
         }
 
-        queue.destroy();
+        queue.tracks.clear();
+        queue.node.pause();
         await interaction.editReply("Bye");
     }
 }

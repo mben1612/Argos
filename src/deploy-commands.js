@@ -20,3 +20,11 @@ restClient.put(Routes.applicationGuildCommands(process.env.DISCORD_APPLICATION_I
     { body: commands })
     .then(() => console.log("Sucessfully registered Commands!"))
     .catch(console.error)
+restClient.put(Routes.applicationGuildCommands(process.env.DISCORD_APPLICATION_ID, process.env.DISCORD_GUILD_ID2),
+{ body: commands })
+.then(() => console.log("Sucessfully registered Commands!"))
+.catch(console.error)
+restClient.put(Routes.applicationGuildCommands(process.env.DISCORD_APPLICATION_ID, process.env.DISCORD_GUILD_ID3),
+{ body: commands })
+.then(() => console.log("Sucessfully registered Commands!"))
+.catch(console.error)

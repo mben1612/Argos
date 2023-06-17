@@ -10,7 +10,7 @@ module.exports ={
 
     async execute(interaction,client) {
         await interaction.deferReply();
-        const queue = client.player.getQueue(interaction.guildId);
+        const queue = client.player.nodes.get(interaction.guildId);
         // console.log(queue);
         if(!queue || !queue.playing){
             await interaction.editReply("Akttuellefswefsefs");

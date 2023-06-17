@@ -3,12 +3,25 @@ const fs = require("fs")
 const {Client, ActivityType, Collection, GatewayIntentBits} = require("discord.js");
 const {Player} = require("discord-player");
 
+
+
+
 const client = new Client({intents:[GatewayIntentBits.Guilds,GatewayIntentBits.GuildMessages,GatewayIntentBits.GuildVoiceStates]});
 
 client.commands = new Collection();
 
-const commandFiles = fs.readdirSync('./src/commands').filter(file => file.endsWith('.js')); 
 
+const commandFiles = fs.readdirSync('./src/commands').filter(file => file.endsWith('.js')); 
+// module.exports = async function getUserbyId(user_id){
+//     users = await client.get_all_members();
+//     var user;
+//     for(let i = 0; i< users.length;i++){
+//         if(user_id == users[i].id){
+//             user = users[i];
+//         }
+//     }
+//     return user;
+// }
 
 commandFiles.forEach((commandFile) => {
     const command = require(`./commands/${commandFile}`)
@@ -50,7 +63,7 @@ client.on("interactionCreate", async (interaction) => {
         originalcommand.buttonclick(interaction);
         return;
     }
-    if (interaction.isSelectMenu()){
+    if (interaction.isStringSelectMenu()){
         var originalcommand;
         // console.log(interaction);
         // interaction.reply({content:"you chose " , ephemeral: true });
@@ -80,10 +93,29 @@ client.on("interactionCreate", async (interaction) => {
         }
     }
 })
-client.player = new Player(client,{
+const player =  new Player(client,{
     ytdlOptions:{
         quality:"highestaudio",
         highWaterMark: 1<<25
     }
 })
+player.extractors.loadDefault()
+client.player = player;
+client.player.on('connectionCreate', (queue) => {
+    queue.connection.voiceConnection.on('stateChange', (oldState, newState) => {
+      const oldNetworking = Reflect.get(oldState, 'networking');
+      const newNetworking = Reflect.get(newState, 'networking');
+      //console.log(newNetworking);
+
+      const networkStateChangeHandler = (oldNetworkState, newNetworkState) => {
+        const newUdp = Reflect.get(newNetworkState, 'udp');
+        clearInterval(newUdp?.keepAliveInterval);
+      }
+
+      oldNetworking?.off('stateChange', networkStateChangeHandler);
+      newNetworking?.on('stateChange', networkStateChangeHandler);
+    });
+});
+
 client.login(process.env.DISCORD_BOT_TOKEN);
+

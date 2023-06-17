@@ -21,7 +21,21 @@ module.exports ={
             await interaction.editReply("Komm sofort in den Sprachkanal")
             return;
         }
-        const queue = await client.player.createQueue(interaction.guild);
+        
+        const queue = client.player.queue || await client.player.nodes.create(interaction.guildId,{
+            selfDeaf: false,
+        });
+        if(client.player.queue != null){
+          console.log("already connected to queue");
+        }
+        else{
+          client.player.queue = queue;
+          try {
+            await queue.connect(interaction.member.voice.channelId, { deaf: false });
+         } catch {
+            return interaction.followUp('Failed to connect to your channel');
+        }
+        }
 
         if(!queue.connection) await queue.connect(interaction.member.voice.channel)
         
@@ -41,7 +55,7 @@ module.exports ={
                         await interaction.editReply("Kein Ergebnis");
                         return;
                     }
-    
+                  
                     const song = result.tracks[0];
                     await queue.addTrack(song);
                     embed
@@ -82,8 +96,7 @@ module.exports ={
                     //.setThumbnail(playlist.thumbnail)
                     break;
                 }
-                else{
-                    
+                else if (url.startsWith("https")){
                     const result = await client.player.search(url,{
                         requestedBy: interaction.user,
                         searchEngine: QueryType.AUTO
@@ -101,13 +114,32 @@ module.exports ={
                         //.setThumbnail(playlist.thumbnail)
                     break;
                 }
+                else{
+                    
+                    const result = await client.player.search(url,{
+                        requestedBy: interaction.user,
+                        searchEngine: QueryType.AUTO
+    
+                    })
+                    if(result.tracks.length ===0){
+                        interaction.editReply("Kein Ergebnis");
+                        return;
+                    }
+    
+                    const playlist = result.tracks;
+                    await queue.addTracks(playlist);
+                    embed
+                        .setDescription(`${result.length} Lieder wurden zur Queue hinzugefügt`)
+                        //.setThumbnail(playlist.thumbnail)
+                    break;
+                }
 
             }
 
         }
 
         //console.log(queue.play());
-        if(!queue.playing) await queue.play()
+        if(!queue.node.isPlaying()) await queue.node.play()
         await interaction.editReply({
             embeds: [embed]
         });

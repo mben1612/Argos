@@ -9,14 +9,14 @@ module.exports ={
 
     async execute(interaction,client) {
         await interaction.deferReply();
-        const queue = client.player.getQueue(interaction.guildId);
+        const queue = client.nodes.get(interaction.guildId);
 
         if(!queue ){
             await interaction.editReply("Akttuellefswefsefs");
             return ;
         }
 
-        queue.setPaused(false);
+        queue.node.resume(false);
         await interaction.editReply("resumed");
     }
 }
