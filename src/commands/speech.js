@@ -1,8 +1,12 @@
 const { SlashCommandBuilder } = require("@discordjs/builders");
 const {EndBehaviorType } = require("@discordjs/voice");
-const { createWriteStream } = require("node:fs")
 const fs = require('fs');
-const lamejs = require("lamejs")
+const transcribe = require("../speechapi");
+const { exec } = require('child_process');
+const { createWriteStream } = require("node:fs")
+
+
+
 
 module.exports ={
     data: new SlashCommandBuilder()
@@ -12,10 +16,14 @@ module.exports ={
 
 
     async execute(interaction,client) {
-        await interaction.deferReply();
+
        var b = interaction.options.getBoolean("bool") || true;
        if(b){
+        await interaction.reply("Listening");
         connect(interaction,client)
+       }
+       else{
+        await interaction.reply("not Listening");
        }
     }
 
@@ -50,47 +58,82 @@ async function connect(interaction, client) {
     const user = guild.members.cache.get(user_id).user;
     
     //voiceConnection.receiver.emitter.setMaxListeners(100);
-    record(interaction,user,queue);
+    record(interaction,user,queue,voiceConnection );
   });
 
 }
  
-const listening = []
+var listening = []
 
 
-async function record(interaction,member, queue){
-    // initialize receiver stream
-
+async function record(interaction,member, queue,voiceConnection ){
+  // initialize receiver stream
+  const date = new Date().getTime();
+  var dataFile = `./recording-${member.id}-${date}`;
   if(listening.includes(member.id)){
+    console.log("Still working");
     return;
   }
   console.log(`I'm listening to ${member.username}`)
   listening.push(member.id);
-  const stream = queue.voiceReceiver.recordUser(member.id, {
-    mode: 'pcm', // record in pcm format
-    end: EndBehaviorType.AfterSilence = 2 // stop recording once user stops talking
-  });
-  const date  = new Date().getSeconds();
 
-  const writer = stream.pipe(createWriteStream(`./recording-${member.id}-${date}.pcm`)); // write the stream to a file
+
+  const stream = queue.voiceReceiver.recordUser(interaction.member.id, {
+    mode: 'pcm', // record in pcm format
+    end: EndBehaviorType.AfterSilence // stop recording once user stops talking
+  });
+   
+  const writer = stream.pipe(createWriteStream(dataFile +".pcm")); // write the stream to a file
 
   writer.once('finish', () => {
-    for (let i = 0; i < listening.length; i++) {
+    console.log("finished");
+    for (let i = 0; i < listening.length; i++) 
+    {
+      console.log(member.id+ " " + listening[i]);
       if (listening[i] == member.id) {
-        listening.concat(i);
+        listening = listening.slice(i+1)
+        console.log(listening);
       }
   }
-    var dataFile = `./recording-${member.id}-${date}.pcm`;
+
+    
     console.log(dataFile);
-    fs.readFile(dataFile, function(err, data) {
-      //console.log(data);
-      var mp3encoder = new lamejs.Mp3Encoder(1, 44100, 128);
-      var mp3 = mp3encoder.encodeBuffer(data);
-      //console.log(mp3); //encode mp3
-      fs.unlinkSync(dataFile);
+    
+    convertToMP3(dataFile+".pcm",dataFile+".mp3",()=>{
+      transcribetext(dataFile);   
     });
+
 
 });
 
 }
+function transcribetext(dataFile){
+  const response = transcribe(dataFile +".mp3");
+  response.then((data) => {
+    console.log(data);
+    fs.unlinkSync(dataFile+".pcm");
+    
+  }).catch((err) => {
+     console.log(err);
+  });
+}
 
+
+function convertToMP3(pcmFilePath,mp3FilePath,myfunction) {
+  const command = `ffmpeg -ac 48000 -ac 1 -f s16le -i ${pcmFilePath} ${mp3FilePath}`;
+
+  exec(command, (error, stdout, stderr) => {
+    if (error) {
+      console.error(`Fehler beim Konvertieren der Audiodatei: ${error.message}`);
+      return;
+    }
+    if (stderr) {
+      console.error(`ffmpeg-Fehler: ${stderr}`);
+      myfunction();
+      return;
+    }
+    console.log(`Die Audiodatei wurde erfolgreich in ${mp3FilePath} konvertiert.`);
+    myfunction();
+   
+  });
+}
